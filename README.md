@@ -28,3 +28,13 @@ before the compilation and behaves the same what
   ```lisp
   (byte-compile `(lambda () ,@body))
   ```
+
+## Acknowledgment
+
+- The original implementation
+
+  https://github.com/tarao/bundle-el/blob/original/eval-after-load-compile.el
+
+- An idea to suppress warnings when `requre` or `load` failed
+
+  https://github.com/lunaryorn/blog/blob/master/posts/introducing-with-eval-after-load.md
