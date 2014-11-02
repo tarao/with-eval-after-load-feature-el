@@ -63,7 +63,7 @@ in case that file does not provide any feature."
                               (t (message "Cannot find %s" feature))
                               'with-no-warnings)))
                    'progn)))
-    `(,form (with-eval-after-load ',feature ,@body))))
+    `(,form (with-eval-after-load ,feature ,@body))))
 
 (provide 'with-eval-after-load-feature)
 ;;; eval-after-load-feature.el ends here
