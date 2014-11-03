@@ -47,7 +47,9 @@
 FILE is normally a feature name, but it can also be a file name,
 in case that file does not provide any feature."
     (declare (indent 1) (debug t))
-    `(eval-after-load ,file (lambda () ,@body))))
+    ;; This definition is a bit different from that in Emacs 24.4; An
+    ;; extra `funcall' is needed for an older Emacs.
+    `(eval-after-load ,file `(funcall (function ,(lambda () ,@body))))))
 
 ;;;###autoload
 (defmacro with-eval-after-load-feature (feature &rest body)
