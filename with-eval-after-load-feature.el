@@ -60,7 +60,7 @@ in case that file does not provide any feature."
                                              (load feat :no-message :no-error))
                                         (and (symbolp feat)
                                              (require feat nil :no-error)))
-                              (t (message "Cannot find %s" feature))
+                              (message "Cannot find %s" feat)
                               'with-no-warnings)))
                    'progn)))
     `(,form (with-eval-after-load ,feature ,@body))))
