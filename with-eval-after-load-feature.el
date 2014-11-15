@@ -39,6 +39,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (eval '(eval-when-compile (require 'cl)))
 
 (unless (fboundp 'with-eval-after-load)
@@ -51,21 +52,39 @@ in case that file does not provide any feature."
     ;; extra `funcall' is needed for an older Emacs.
     `(eval-after-load ,file `(funcall (function ,(lambda () ,@body))))))
 
+(defun with-eval-after-load-feature-preload-1 (feature)
+  (let ((after-load-alist nil))
+    (unless (or (and (stringp feature)
+                     (load feature :no-message :no-error))
+                (and (symbolp feature)
+                     (require feature nil :no-error)))
+      (message "Cannot find %s" feature)
+      'fail)))
+
+(defun with-eval-after-load-feature-preload (feature-list)
+  (loop for f in feature-list
+        for fail = (with-eval-after-load-feature-preload-1 f)
+        when fail
+        collect fail))
+
+(defun with-eval-after-load-feature-transform (feature-list body)
+  (if (null feature-list)
+      body
+    (let ((feature (car feature-list)) (rest (cdr feature-list)))
+    `((with-eval-after-load ',feature
+       ,@(with-eval-after-load-feature-transform rest body))))))
+
 ;;;###autoload
 (defmacro with-eval-after-load-feature (feature &rest body)
   (declare (indent 1) (debug t))
-  (let* ((feat (if (and (listp feature) (eq (nth 0 feature) 'quote))
-                  (nth 1 feature) feature))
-         (after-load-alist nil)
-         (form (or (eval '(eval-when (compile)
-                            (unless (or (and (stringp feat)
-                                             (load feat :no-message :no-error))
-                                        (and (symbolp feat)
-                                             (require feat nil :no-error)))
-                              (message "Cannot find %s" feat)
-                              'with-no-warnings)))
+  (let* ((feature (if (and (listp feature) (eq (car-safe feature) 'quote))
+                      (cdr feature) feature))
+         (fs (if (listp feature) feature (list feature)))
+         (form (or (and (eval '(eval-when (compile)
+                                 (with-eval-after-load-feature-preload fs)))
+                        'with-no-warnings)
                    'progn)))
-    `(,form (with-eval-after-load ,feature ,@body))))
+    `(,form ,@(with-eval-after-load-feature-transform fs body))))
 
 (provide 'with-eval-after-load-feature)
 ;;; eval-after-load-feature.el ends here
