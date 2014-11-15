@@ -29,6 +29,17 @@ before the compilation and behaves the same what
   (byte-compile `(lambda () ,@body))
   ```
 
+  You can specify multiple *package* as a list:
+
+  ```lisp
+  (with-eval-after-load-feature (feature1 feature2)
+    ;; body
+  )
+  ```
+
+  In this case, *body* will be evaluated after all the *packages* are
+  loaded.
+
 ## Acknowledgment
 
 - The original implementation
