@@ -53,7 +53,7 @@ If you need to wait loading multiple features, you can pass a list
 form.
 ```lisp
 (with-eval-after-load-feature (evil anything-config)
-  (evil-define-key (kbd ":") #'anything-for-files))
+  (define-key evil-motion-state-map (kbd ":") #'anything-for-files))
 ```
 
 This is equivalent to the following code.
