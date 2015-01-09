@@ -19,8 +19,9 @@ before the compilation and behaves the same what
 - `with-eval-after-load-feature` ( *package* *body*... )
 
   Arrange that if *package* is loaded, *body* will be run immediately
-  afterwards.  This is equivalent to `with-eval-after-load` except
-  that the *package* is automatically loaded when *body* is compiled.
+  afterwards.  This is equivalent to `with-eval-after-load` except two
+  additional features: the *package* is automatically loaded when
+  *body* is compiled, and, *package* can be a list form.
 
   Note that *body* is compiled as a function body by the following
   code.  Don't put anything which should not be in a function body.
@@ -29,16 +30,38 @@ before the compilation and behaves the same what
   (byte-compile `(lambda () ,@body))
   ```
 
-  You can specify multiple *package* as a list:
+## Example
 
-  ```lisp
-  (with-eval-after-load-feature (feature1 feature2)
-    ;; body
-  )
-  ```
+Consider to compile the following code.  You will get *"Warning:
+reference to free variable `anything-map'"* warning.
+```lisp
+(with-eval-after-load 'anything
+  (define-key anything-map (kbd "M-n") #'anything-next-source)
+  (define-key anything-map (kbd "M-p") #'anything-previous-source))
+```
 
-  In this case, *body* will be evaluated after all the *packages* are
-  loaded.
+Using `with-eval-after-load-feature` instead of `with-eval-after-load`
+suppresses the warning since the feature is automatically loaded at
+compile time.
+```lisp
+(with-eval-after-load-feature 'anything
+  (define-key anything-map (kbd "M-n") #'anything-next-source)
+  (define-key anything-map (kbd "M-p") #'anything-previous-source))
+```
+
+If you need to wait loading multiple features, you can pass a list
+form.
+```lisp
+(with-eval-after-load-feature (evil anything-config)
+  (evil-define-key (kbd ":") #'anything-for-files))
+```
+
+This is equivalent to the following code.
+```lisp
+(with-eval-after-load-feature 'evil
+  (with-eval-after-load-feature 'anything-config
+    (evil-define-key (kbd ":") #'anything-for-files)))
+```
 
 ## Acknowledgment
 
