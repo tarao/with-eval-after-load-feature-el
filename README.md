@@ -60,7 +60,7 @@ This is equivalent to the following code.
 ```lisp
 (with-eval-after-load-feature 'evil
   (with-eval-after-load-feature 'anything-config
-    (evil-define-key (kbd ":") #'anything-for-files)))
+    (define-key evil-motion-state-map (kbd ":") #'anything-for-files)))
 ```
 
 ## Acknowledgment
